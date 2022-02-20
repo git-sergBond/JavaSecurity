@@ -2,9 +2,13 @@ package ss.bond;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
@@ -35,6 +39,14 @@ public class Main {
             cipher.init(Cipher.ENCRYPT_MODE, key);
             System.out.println("cipher initialised");
         } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
+        byte[] plainText = "it is my secret".getBytes(StandardCharsets.UTF_8);
+        try {
+            byte[] cipherText = cipher.doFinal(plainText);
+            System.out.println("cipherText=" + new String(cipherText, StandardCharsets.UTF_8));
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
 
