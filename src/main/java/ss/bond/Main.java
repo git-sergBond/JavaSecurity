@@ -6,6 +6,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -57,6 +58,29 @@ public class Main {
         byte[] digest = messageDigest.digest();
         System.out.println("digest: " + Arrays.toString(digest));
 
+        //MAC (HMAC)
+        //TODO как правильно передать секретный ключ, для HMAC ?
+        Mac mac = null;
+        try {
+            mac = Mac.getInstance("HmacSHA256");
+        }catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(mac)) {
+            System.err.println("messageDigest is NULL");
+            return;
+        }
+        SecretKeySpec key = getSecretKeySpec();
+        try {
+            mac.init(key);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        mac.update(data1);
+        mac.update(data1);
+        byte[] macBytes = mac.doFinal();
+        System.out.println("MAC: " + Arrays.toString(macBytes));
+
         System.out.println("test");
     }
 
@@ -75,10 +99,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        byte[] keyBytes = new byte[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-        String keyAlgorithm = "RawBytes";
-        SecretKeySpec key = new SecretKeySpec(keyBytes, keyAlgorithm);
-        System.out.println("key(" + keyAlgorithm +") success");
+        SecretKeySpec key = getSecretKeySpec();
 
         try {
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -94,5 +115,13 @@ public class Main {
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
+    }
+
+    private static SecretKeySpec getSecretKeySpec() {
+        byte[] keyBytes = new byte[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+        String keyAlgorithm = "RawBytes";
+        SecretKeySpec key = new SecretKeySpec(keyBytes, keyAlgorithm);
+        System.out.println("key(" + keyAlgorithm +") success");
+        return key;
     }
 }
