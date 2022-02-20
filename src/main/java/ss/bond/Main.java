@@ -82,7 +82,7 @@ public class Main {
         byte[] macBytes = mac.doFinal();
         System.out.println("MAC: " + Arrays.toString(macBytes));
 
-        //Signature
+        //Signature sign
         //TODO Использует ли Signature MAC или Digest ?
         //TODO если не использует, то как применить HMAC к Signature?
         Signature signature = null;
@@ -110,6 +110,39 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("signatureBytes: " + Arrays.toString(signatureBytes));
+
+
+        //Signature verify
+        //TODO попробовать signatureVerify.initVerify(Certificate);
+        Signature signatureVerify = null;
+        try {
+            signatureVerify = Signature.getInstance("SHA256WithDSA");
+        }catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(signatureVerify)) {
+            System.err.println("signatureVerify is NULL");
+            return;
+        }
+        try {
+            signatureVerify.initVerify(keyPair.getPublic());
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(signatureBytes)) {
+            System.err.println("signatureBytes is NULL");
+            return;
+        }
+        boolean verified = false;
+        try {
+            signatureVerify.update(data1);
+            signatureVerify.update(data2);
+            verified = signatureVerify.verify(signatureBytes);
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+        System.out.println("verified: " + verified);
+
 
 
         System.out.println("test");
