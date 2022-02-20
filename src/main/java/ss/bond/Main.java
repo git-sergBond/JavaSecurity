@@ -7,15 +7,60 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
+import java.security.SecureRandom;
+import java.security.KeyPairGenerator;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class Main {
 
     public static void main(String[] args) {
+        Security.addProvider(new BouncyCastleProvider());
+
+        //KeyPair
+        SecureRandom secureRandom = new SecureRandom();
+        KeyPairGenerator keyPairGenerator = null;
+        try {
+            keyPairGenerator = KeyPairGenerator.getInstance("DSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(keyPairGenerator)) {
+            System.err.println("keyPairGenerator is NULL");
+            return;
+        }
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        System.out.println("public: " + keyPair.getPublic());
+        System.out.println("private: " + Arrays.toString(keyPair.getPrivate().getEncoded()));
+
+        //Digest
+        MessageDigest messageDigest = null;
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(messageDigest)) {
+            System.err.println("messageDigest is NULL");
+            return;
+        }
+        byte[] data1 = "ABCDE".getBytes(StandardCharsets.UTF_8);
+        byte[] data2 = "12345".getBytes(StandardCharsets.UTF_8);
+        messageDigest.update(data1);
+        messageDigest.update(data2);
+        byte[] digest = messageDigest.digest();
+        System.out.println("digest: " + Arrays.toString(digest));
+
+        System.out.println("test");
+    }
+
+    private static void encryptExample() {
         Security.addProvider(new BouncyCastleProvider());
 
         Cipher cipher = null;
@@ -49,7 +94,5 @@ public class Main {
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
-
-        System.out.println("test");
     }
 }
