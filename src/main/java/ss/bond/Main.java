@@ -16,6 +16,8 @@ import java.security.SecureRandom;
 import java.security.KeyPairGenerator;
 import java.security.KeyPair;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -25,8 +27,7 @@ public class Main {
         Security.addProvider(new BouncyCastleProvider());
 
         //KeyPair
-        SecureRandom secureRandom = new SecureRandom();
-        KeyPairGenerator keyPairGenerator = null;
+        KeyPairGenerator keyPairGenerator = null;//TODO посмотреть альтренативный способ генерации ключй с указанием своего способа генерации (см. примеры) (например SecureRandom secureRandom = new SecureRandom();)
         try {
             keyPairGenerator = KeyPairGenerator.getInstance("DSA");
         } catch (NoSuchAlgorithmException e) {
@@ -80,6 +81,36 @@ public class Main {
         mac.update(data1);
         byte[] macBytes = mac.doFinal();
         System.out.println("MAC: " + Arrays.toString(macBytes));
+
+        //Signature
+        //TODO Использует ли Signature MAC или Digest ?
+        //TODO если не использует, то как применить HMAC к Signature?
+        Signature signature = null;
+        try {
+            signature = Signature.getInstance("SHA256WithDSA");
+        }catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(signature)) {
+            System.err.println("signature is NULL");
+            return;
+        }
+        SecureRandom secureRandom = new SecureRandom();
+        try {
+            signature.initSign(keyPair.getPrivate(), secureRandom);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        byte[] signatureBytes = null;
+        try {
+            signature.update(data1);
+            signature.update(data2);
+            signatureBytes = signature.sign();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+        System.out.println("signatureBytes: " + Arrays.toString(signatureBytes));
+
 
         System.out.println("test");
     }
