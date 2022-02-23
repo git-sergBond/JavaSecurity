@@ -10,6 +10,7 @@ public class Lesson2 {
 
     @Test
     public void cipher() {
+        Cipher cipher1, cipher2;
         try {
             /**
              * Режимы ширфования:
@@ -28,7 +29,8 @@ public class Lesson2 {
              * CTR - Counter (Режим счетчика)
              * https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B6%D0%B8%D0%BC_%D1%88%D0%B8%D1%84%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F#Counter_mode_%28CTR%29
              */
-            Cipher cipher = Cipher.getInstance("AES");
+            cipher1 = Cipher.getInstance("AES");
+            cipher2 = Cipher.getInstance("AES/CBC/PKCS5Padding");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
