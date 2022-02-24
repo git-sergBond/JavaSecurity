@@ -122,4 +122,26 @@ public class Lesson2 {
             e.printStackTrace();
         }
     }
+
+
+    @Test
+    public void cipherReuseCipherInstance() {
+        try {
+            byte[] data1 = "abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8);
+            byte[] data2 = "zyxwvutsrqponmlkjihgfedcba".getBytes(StandardCharsets.UTF_8);
+            byte[] data3 = "cccc".getBytes(StandardCharsets.UTF_8);
+
+            cipher1.init(Cipher.ENCRYPT_MODE, key);
+            byte[] cipherByte1 = cipher1.update(data1); // return null
+            byte[] cipherByte2 = cipher1.doFinal(data2);
+            byte[] cipherByte3 = cipher1.doFinal(data3);
+
+            cipher1.init(Cipher.DECRYPT_MODE, key);
+            //TODO java.lang.NullPointerException new String(cipher1.update(cipherByte1), StandardCharsets.UTF_8);
+            assert "qrstuvwxyzzyxwvutsrqponmlkjihgfedcba".equals(new String(cipher1.doFinal(cipherByte2), StandardCharsets.UTF_8));
+            assert "cccc".equals(new String(cipher1.doFinal(cipherByte3), StandardCharsets.UTF_8));
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        }
+    }
 }
