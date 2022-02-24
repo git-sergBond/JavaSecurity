@@ -8,6 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.ShortBufferException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -81,6 +82,43 @@ public class Lesson2 {
         } catch (InvalidKeyException
                 | IllegalBlockSizeException
                 | BadPaddingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void cipherReuseArray() {
+        try {
+            int offset = 5;
+            int length = 5;
+            byte[] data = "aaaabbbbcccc".getBytes(StandardCharsets.UTF_8);
+            byte[] destination = new byte[1024];
+
+            cipher1.init(Cipher.ENCRYPT_MODE, key);
+            int resultLength = cipher1.doFinal(data, offset, length, destination);
+
+            cipher1.init(Cipher.DECRYPT_MODE, key);
+            assert "bbbcc".equals(new String(cipher1.doFinal(destination, 0, resultLength), StandardCharsets.UTF_8));
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | ShortBufferException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void cipherReuseArrayWithOffset() {
+        try {
+            int offset = 5;
+            int length = 5;
+            byte[] data = "aaaabbbbcccc".getBytes(StandardCharsets.UTF_8);
+            byte[] destination = new byte[1024];
+
+            cipher1.init(Cipher.ENCRYPT_MODE, key);
+            int destinationOffset = 50;
+            int resultLength = cipher1.doFinal(data, offset, length, destination, destinationOffset);
+
+            cipher1.init(Cipher.DECRYPT_MODE, key);
+            assert "bbbcc".equals(new String(cipher1.doFinal(destination, destinationOffset, resultLength), StandardCharsets.UTF_8));
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | ShortBufferException e) {
             e.printStackTrace();
         }
     }
