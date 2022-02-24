@@ -52,7 +52,7 @@ public class Lesson2 {
      * doFinal нужен только для того, чтобы добавить padding к последнему блоку
      */
     @Test
-    public void cipher() {
+    public void cipherUpdateDoFinal() {
        try {
             cipher1.init(Cipher.ENCRYPT_MODE, key);
             cipher1.update("aaaa".getBytes(StandardCharsets.UTF_8));
@@ -61,6 +61,23 @@ public class Lesson2 {
 
             cipher1.init(Cipher.DECRYPT_MODE, key);
             assert "aaaabbbbcccc".equals(new String(cipher1.doFinal(cipherBytes), StandardCharsets.UTF_8));
+        } catch (InvalidKeyException
+                | IllegalBlockSizeException
+                | BadPaddingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void cipherOffset() {
+        try {
+            cipher1.init(Cipher.ENCRYPT_MODE, key);
+            int offset = 5;
+            int length = 5;
+            byte[] cipherBytes = cipher1.doFinal("aaaabbbbcccc".getBytes(StandardCharsets.UTF_8), offset, length);
+
+            cipher1.init(Cipher.DECRYPT_MODE, key);
+            assert "bbbcc".equals(new String(cipher1.doFinal(cipherBytes), StandardCharsets.UTF_8));
         } catch (InvalidKeyException
                 | IllegalBlockSizeException
                 | BadPaddingException e) {
