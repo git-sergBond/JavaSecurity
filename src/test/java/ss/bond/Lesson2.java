@@ -16,11 +16,9 @@ import java.security.Security;
 
 public class Lesson2 {
 
-    @Test
-    public void cipher() {
+    Cipher cipher1;
+    {
         Security.addProvider(new BouncyCastleProvider());
-
-        Cipher cipher1, cipher2;
         try {
             /**
              * Режимы ширфования:
@@ -39,25 +37,31 @@ public class Lesson2 {
              * CTR - Counter (Режим счетчика)
              * https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B6%D0%B8%D0%BC_%D1%88%D0%B8%D1%84%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F#Counter_mode_%28CTR%29
              */
-            cipher1 = Cipher.getInstance("AES");
-            cipher2 = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher1 = Cipher.getInstance("AES");//Cipher.getInstance("AES/CBC/PKCS5Padding");
+        } catch (NoSuchAlgorithmException
+                | NoSuchPaddingException e) {
+            e.printStackTrace();
+        }
+    }
 
-            Key key = new SecretKeySpec(new byte[] {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}, "RawBytes");
+    Key key = new SecretKeySpec(new byte[] {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}, "RawBytes");
 
+    //TODO read doc for updateAAD and other overload methods and Cipher https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html
+
+    /**
+     * doFinal нужен только для того, чтобы добавить padding к последнему блоку
+     */
+    @Test
+    public void cipher() {
+       try {
             cipher1.init(Cipher.ENCRYPT_MODE, key);
             cipher1.update("aaaa".getBytes(StandardCharsets.UTF_8));
             cipher1.update("bbbb".getBytes(StandardCharsets.UTF_8));
-            // doFinal нужен только для того, чтобы добавить padding к последнему блоку
             byte[] cipherBytes = cipher1.doFinal("cccc".getBytes(StandardCharsets.UTF_8));
 
-            //TODO read doc for updateAAD and Cipher https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html
-
             cipher1.init(Cipher.DECRYPT_MODE, key);
-            System.out.println(new String(cipher1.doFinal(cipherBytes), StandardCharsets.UTF_8));
-
-        } catch (NoSuchAlgorithmException
-                | NoSuchPaddingException
-                | InvalidKeyException
+            assert "aaaabbbbcccc".equals(new String(cipher1.doFinal(cipherBytes), StandardCharsets.UTF_8));
+        } catch (InvalidKeyException
                 | IllegalBlockSizeException
                 | BadPaddingException e) {
             e.printStackTrace();
