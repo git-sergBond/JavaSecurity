@@ -3,9 +3,12 @@ package ss.bond;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -42,10 +45,19 @@ public class Lesson2 {
             Key key = new SecretKeySpec(new byte[] {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}, "RawBytes");
 
             cipher1.init(Cipher.ENCRYPT_MODE, key);
+            cipher1.update("aaaa".getBytes(StandardCharsets.UTF_8));
+            cipher1.update("bbbb".getBytes(StandardCharsets.UTF_8));
+            // doFinal нужен только для того, чтобы добавить padding к последнему блоку
+            byte[] cipherBytes = cipher1.doFinal("cccc".getBytes(StandardCharsets.UTF_8));
 
             cipher1.init(Cipher.DECRYPT_MODE, key);
+            System.out.println(new String(cipher1.doFinal(cipherBytes), StandardCharsets.UTF_8));
 
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+        } catch (NoSuchAlgorithmException
+                | NoSuchPaddingException
+                | InvalidKeyException
+                | IllegalBlockSizeException
+                | BadPaddingException e) {
             e.printStackTrace();
         }
     }
