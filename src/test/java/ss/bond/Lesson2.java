@@ -38,7 +38,8 @@ public class Lesson2 {
              * CTR - Counter (Режим счетчика)
              * https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B6%D0%B8%D0%BC_%D1%88%D0%B8%D1%84%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F#Counter_mode_%28CTR%29
              */
-            cipher1 = Cipher.getInstance("AES");//Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher1 = Cipher.getInstance("AES");
+            //cipher1 = Cipher.getInstance("AES/CBC/PKCS5Padding");
         } catch (NoSuchAlgorithmException
                 | NoSuchPaddingException e) {
             e.printStackTrace();
@@ -125,22 +126,54 @@ public class Lesson2 {
 
 
     @Test
-    public void cipherReuseCipherInstance() {
+    public void cipherReuseCipherInstance1() {
         try {
-            byte[] data1 = "abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8);
-            byte[] data2 = "zyxwvutsrqponmlkjihgfedcba".getBytes(StandardCharsets.UTF_8);
-            byte[] data3 = "cccc".getBytes(StandardCharsets.UTF_8);
-
             cipher1.init(Cipher.ENCRYPT_MODE, key);
-            byte[] cipherByte1 = cipher1.update(data1); // return null
-            byte[] cipherByte2 = cipher1.doFinal(data2);
-            byte[] cipherByte3 = cipher1.doFinal(data3);
+            byte[] cipherByte1 = cipher1.update("ccc".getBytes(StandardCharsets.UTF_8)); // NULL
+            byte[] cipherByte2 = cipher1.doFinal("abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8));
+            byte[] cipherByte3 = cipher1.doFinal("zyxwvutsrqponmlkjihgfedcba".getBytes(StandardCharsets.UTF_8));
+
+            assert cipherByte2 != null;
+            assert cipherByte3 != null;
 
             cipher1.init(Cipher.DECRYPT_MODE, key);
-            //TODO java.lang.NullPointerException  https://stackoverflow.com/questions/26206455/aes-javax-crypto-cipher-returns-empty-array-in-decryption-mode
-            new String(cipher1.update(cipherByte1), StandardCharsets.UTF_8);
-            assert "qrstuvwxyzzyxwvutsrqponmlkjihgfedcba".equals(new String(cipher1.doFinal(cipherByte2), StandardCharsets.UTF_8));
-            assert "cccc".equals(new String(cipher1.doFinal(cipherByte3), StandardCharsets.UTF_8));
+            byte[] data2, data3;
+            data2 = cipher1.doFinal(cipherByte2);
+            data3 = cipher1.doFinal(cipherByte3);
+            System.out.println(new String(data2, StandardCharsets.UTF_8));
+            System.out.println(new String(data3, StandardCharsets.UTF_8));
+
+            assert "cccabcdefghijklmnopqrstuvwxyz".equals(new String(data2, StandardCharsets.UTF_8));
+            assert "zyxwvutsrqponmlkjihgfedcba".equals(new String(data3, StandardCharsets.UTF_8));
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void cipherReuseCipherInstance2() {
+        try {
+            cipher1.init(Cipher.ENCRYPT_MODE, key);
+            byte[] cipherByte1 = cipher1.update("01234567890123456789012345".getBytes(StandardCharsets.UTF_8));
+            byte[] cipherByte2 = cipher1.doFinal("abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8));
+            byte[] cipherByte3 = cipher1.doFinal("zyxwvutsrqponmlkjihgfedcba".getBytes(StandardCharsets.UTF_8));
+
+            assert cipherByte1 != null;
+            assert cipherByte2 != null;
+            assert cipherByte3 != null;
+
+            cipher1.init(Cipher.DECRYPT_MODE, key);
+            byte[] data1, data2, data3;
+            data1 = cipher1.update(cipherByte1); // NULL
+            data2 = cipher1.doFinal(cipherByte2);
+            data3 = cipher1.doFinal(cipherByte3);
+
+            //System.out.println(new String(data1, StandardCharsets.UTF_8));
+            System.out.println(new String(data2, StandardCharsets.UTF_8));
+            System.out.println(new String(data3, StandardCharsets.UTF_8));
+            
+            assert "01234567890123456789012345abcdefghijklmnopqrstuvwxyz".equals(new String(data2, StandardCharsets.UTF_8));
+            assert "zyxwvutsrqponmlkjihgfedcba".equals(new String(data3, StandardCharsets.UTF_8));
         } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
