@@ -7,12 +7,13 @@ import javax.crypto.SecretKey;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.util.function.Consumer;
 
 public class Lesson7 {
 
@@ -22,20 +23,6 @@ public class Lesson7 {
         System.out.println(keyStore1.getType());//pkcs12
 
         KeyStore keyStore2 = KeyStore.getInstance("PKCS12");
-    }
-
-    @Test
-    public void loadKeyStore() throws KeyStoreException {
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        //TODO create keyStore.ks
-        //TODO try load .jks
-        char[] keyStorePassword = "123abc".toCharArray();
-        try(InputStream keyStoreData = new FileInputStream("keyStore.ks")) {
-            keyStore.load(keyStoreData, keyStorePassword);
-        } catch (IOException | CertificateException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
@@ -63,17 +50,56 @@ public class Lesson7 {
 
     @Test
     public void saveKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        char[] keyStorePassword = "123abc".toCharArray();
-        keyStore.load(null, keyStorePassword);
-
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(256);
         SecretKey secretKey = keyGenerator.generateKey();
-        KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(secretKey);
 
-        KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection("superSecurePassword".toCharArray());
-        keyStore.setEntry("superSecretKey", secretKeyEntry, passwordProtection);
+        storeKeyStore("keyStore.ks", "123abc", (keyStore -> {
+            KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(secretKey);
+
+            KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection("superSecurePassword".toCharArray());
+            try {
+                keyStore.setEntry("superSecretKey", secretKeyEntry, passwordProtection);
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            }
+        }));
+
+        loadKeyStore("keyStore.ks", "123abc", keyStore -> {
+            try {
+                KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection("superSecurePassword".toCharArray());
+                KeyStore.SecretKeyEntry keyEntry = (KeyStore.SecretKeyEntry) keyStore.getEntry("superSecretKey", passwordProtection);
+
+                assert keyEntry.getSecretKey() != null;
+                assert keyEntry.getSecretKey().equals(secretKey);
+            } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void storeKeyStore(String path, String password, Consumer<KeyStore> storeConsumer) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException{
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        char[] keyStorePassword = password.toCharArray();
+        keyStore.load(null, keyStorePassword);
+
+        storeConsumer.accept(keyStore);
+
+        try (FileOutputStream outputStream = new FileOutputStream(path)) {
+            keyStore.store(outputStream, keyStorePassword);//TODO что если тут передать отличающийся пароли от keyStorePassword
+        }
+    }
+
+    private void loadKeyStore(String path, String password, Consumer<KeyStore> storeConsumer) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        //TODO create keyStore.ks
+        //TODO try load .jks
+        try(InputStream keyStoreData = new FileInputStream(path)) {
+            keyStore.load(keyStoreData, password.toCharArray());
+        }
+
+        storeConsumer.accept(keyStore);
     }
 }
