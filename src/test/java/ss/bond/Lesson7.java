@@ -15,10 +15,15 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.function.Consumer;
 
+//TODO Генерация ключевой пары
+//TODO keytool -importcert -alias testkey -keypass 123456 -storetype JKS -keystore keystore2.jks -file cert.cert -rfc -storepass abcdef
+
+
 public class Lesson7 {
 
     @Test
     public void keyStore() throws KeyStoreException {
+        //TODO какие еще могут ыть типы хранилищ?
         KeyStore keyStore1 = KeyStore.getInstance(KeyStore.getDefaultType());
         System.out.println(keyStore1.getType());//pkcs12
 
@@ -48,6 +53,13 @@ public class Lesson7 {
         //TODO рассмотреть методы PrivateKeyEntry, Entry, SecretKeyEntry
     }
 
+    /**
+     * Просмотр данных через командную строку:
+     * keytool -list -storetype JKS -keystore keyStore.ks -storepass 123abc -v
+     *
+     * Удаление конкретной Entity:
+     * keytool -delete -alias supersecretkey -storetype JKS -keystore keyStore.ks -storepass 123abc -v
+     */
     @Test
     public void saveKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
