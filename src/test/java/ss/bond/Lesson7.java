@@ -15,10 +15,6 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.function.Consumer;
 
-//TODO Генерация ключевой пары
-//TODO keytool -importcert -alias testkey -keypass 123456 -storetype JKS -keystore keystore2.jks -file cert.cert -rfc -storepass abcdef
-
-
 public class Lesson7 {
 
     @Test
@@ -59,6 +55,18 @@ public class Lesson7 {
      *
      * Удаление конкретной Entity:
      * keytool -delete -alias supersecretkey -storetype JKS -keystore keyStore.ks -storepass 123abc -v
+     *
+     * Генерация ключевой пары:
+     * keytool -genkeypair -alias keypair2 -dname 'CN=Sergey Bondarenko, OU=ARGO, O=Neoflex, L=Voronesh, ST=Moscow, C=2222' -keystore keyStore.ks -storepass 123abc
+     *
+     * Просмотр данных ключевой пары:
+     * keytool -list -alias keypair2 -storetype JKS -keystore keyStore.ks -storepass 123abc -v
+     *
+     * Генерация запроса на сертификат:
+     * keytool -certreq -alias keypair2 -storetype JKS -keystore keyStore.ks -storepass 123abc -file CN=SergeyBondarenko.certreq
+     *
+     * TODO issue certificate
+     * TODO keytool -importcert -alias testkey -keypass 123456 -storetype JKS -keystore keystore2.jks -file cert.cert -rfc -storepass abcdef
      */
     @Test
     public void saveKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
