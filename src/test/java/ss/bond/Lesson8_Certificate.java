@@ -2,15 +2,18 @@ package ss.bond;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.NoSuchProviderException;
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
@@ -47,13 +50,34 @@ public class Lesson8_Certificate {
         System.out.println(publicKey);
         System.out.println("===getType===");
         System.out.println(certificate.getType());//X.509
+        System.out.println("===verify===");
+        PublicKey publicKeyFromRootCA = null;//TODO sign Cert by RootCA and getRootCA
+        try {
+            certificate.verify(publicKeyFromRootCA);
+        } catch (InvalidKeyException e) {
+            System.err.println("сертификат не был подписан данным открытым ключом");
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException |
+                NoSuchProviderException |
+                SignatureException |
+                CertificateException e){
+            System.err.println("что-то еще пошло не так");
+            e.printStackTrace();
+        }
+
 
         X509Certificate x509Certificate = (X509Certificate) certificate;//X509Certificate implement Certificate
         //TODO просмотреть методы X509Certificate
     }
 
     @Test
-    public void getCertificateFromCertificateFactory() {
+    public void getCertificateFromCertificateFactory() throws CertificateException, IOException {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 
+        try(FileInputStream fileInputStream = new FileInputStream("server.cer")) {
+            X509Certificate x509Certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
+            System.out.println("===x509Certificate===");
+            System.out.println(x509Certificate);
+        }
     }
 }
