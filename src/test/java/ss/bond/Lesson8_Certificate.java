@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 public class Lesson8_Certificate {
 
@@ -36,7 +38,18 @@ public class Lesson8_Certificate {
         Certificate certificate = keyStore.getCertificate("server-alias");
 
         assert certificate != null;
-        System.out.println(certificate.toString());
+        System.out.println("===certificate===");
+        System.out.println(certificate);
+        System.out.println("===getEncoded===");
+        System.out.println(Arrays.toString(certificate.getEncoded()));//ASN1 DER
+        PublicKey publicKey = certificate.getPublicKey();
+        System.out.println("===publicKey===");
+        System.out.println(publicKey);
+        System.out.println("===getType===");
+        System.out.println(certificate.getType());//X.509
+
+        X509Certificate x509Certificate = (X509Certificate) certificate;//X509Certificate implement Certificate
+        //TODO просмотреть методы X509Certificate
     }
 
     @Test
