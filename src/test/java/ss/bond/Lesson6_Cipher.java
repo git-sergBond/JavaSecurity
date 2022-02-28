@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 
-public class Lesson6 {
+public class Lesson6_Cipher {
 
     @Test
     public void key() throws NoSuchAlgorithmException {

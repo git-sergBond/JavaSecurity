@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 
-public class Lesson5 {
+public class Lesson5_Signature {
 
     @Test
     public void signature() throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {

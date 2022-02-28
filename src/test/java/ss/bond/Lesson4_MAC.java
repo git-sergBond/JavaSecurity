@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-public class Lesson4 {
+public class Lesson4_MAC {
 
     @Test
     public void mac() throws NoSuchAlgorithmException, InvalidKeyException {

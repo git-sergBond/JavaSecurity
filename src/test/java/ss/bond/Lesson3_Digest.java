@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Lesson3 {
+public class Lesson3_Digest {
 
     @Test
     public void digestOneBlock() throws NoSuchAlgorithmException {

@@ -15,7 +15,7 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.function.Consumer;
 
-public class Lesson7 {
+public class Lesson7_KeyStore {
 
     @Test
     public void keyStore() throws KeyStoreException {

@@ -15,7 +15,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
-public class Lesson2 {
+public class Lesson2_Cipher {
 
     Cipher cipher1;
     {

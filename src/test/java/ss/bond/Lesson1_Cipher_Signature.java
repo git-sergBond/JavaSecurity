@@ -22,7 +22,7 @@ import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Lesson1 {
+public class Lesson1_Cipher_Signature {
 
     @Test
     public void encryptTest() {
