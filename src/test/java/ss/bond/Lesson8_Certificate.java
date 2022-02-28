@@ -15,7 +15,11 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.cert.CertPath;
+import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class Lesson8_Certificate {
 
@@ -79,5 +83,35 @@ public class Lesson8_Certificate {
             System.out.println("===x509Certificate===");
             System.out.println(x509Certificate);
         }
+    }
+
+    @Test
+    public void certPath() {
+        //TODO laod from CertificateFactory или CertPathBuilder
+        CertPath certPath = new CertPath("X.509") {
+            @Override
+            public Iterator<String> getEncodings() {
+                return null;
+            }
+
+            @Override
+            public byte[] getEncoded() throws CertificateEncodingException {
+                return new byte[0];
+            }
+
+            @Override
+            public byte[] getEncoded(String s) throws CertificateEncodingException {
+                return new byte[0];
+            }
+
+            @Override
+            public List<? extends Certificate> getCertificates() {
+                return null;
+            }
+        };
+        List<Certificate> certificates = (List<Certificate>) certPath.getCertificates();
+        System.out.println(certPath.getType());
+        //TODO check CRL, check other methods
+        //TODO sign by RootCA and read cert chain and check
     }
 }
